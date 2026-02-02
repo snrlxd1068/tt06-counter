@@ -30,7 +30,8 @@ async def test_project(dut):
     for val in expected_values:
         await ClockCycles(dut.clk, 1)
         # We only care about the lower 2 bits of uo_out
-        actual_val = dut.uo_out[1:0].value.integer
+        out = dut.uo_out
+        actual_val = out[1:0].value.integer
         assert actual_val == val
         dut._log.info(f"Up Count: {actual_val}")
 
@@ -41,7 +42,8 @@ async def test_project(dut):
     # Current state is 0, next should be 3, 2, 1, 0
     expected_values = [3, 2, 1, 0]
     for val in expected_values:
-        actual_val = dut.uo_out[1:0].value.integer
+        out = dut.uo_out
+        actual_val = out[1:0].value.integer
         assert actual_val == val
         dut._log.info(f"Down Count: {actual_val}")
 
