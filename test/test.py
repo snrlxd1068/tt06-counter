@@ -20,21 +20,32 @@ async def test_project(dut):
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
-    await ClockCycles(dut.clk, 10)
+    await ClockCycles(dut.clk, 3)
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
+    dut._log.info("Testing Up Counter...")
+    dut.ui_in.value = 1  # ui_in[0] set to 1
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    expected_values = [1, 2, 3, 0]
+    for val in expected_values:
+        await ClockCycles(dut.clk, 1)
+        # We only care about the lower 2 bits of uo_out
+        actual_val = dut.uo_out[1:0].value.integer
+        assert actual_val == val
+        dut._log.info(f"Up Count: {actual_val}")
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    # 4. Test Down Counting (ui_in[0] = 0)
+    dut._log.info("Testing Down Counter...")
+    dut.ui_in.value = 0  # ui_in[0] set to 0
+    
+    # Current state is 0, next should be 3, 2, 1, 0
+    expected_values = [3, 2, 1, 0]
+    for val in expected_values:
+        actual_val = dut.uo_out[1:0].value.integer
+        assert actual_val == val
+        dut._log.info(f"Down Count: {actual_val}")
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+    dut._log.info("All tests passed!")
 
     # Keep testing the module by changing the input values, waiting for
     # one or more clock cycles, and asserting the expected output values.
