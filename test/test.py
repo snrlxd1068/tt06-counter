@@ -30,7 +30,7 @@ async def test_project(dut):
     for val in expected_values:
         await ClockCycles(dut.clk, 1)
         await cocotb.triggers.ReadOnly()
-        await NextTimeStep()
+        await cocotb.triggers.NextTimeStep()
         # We only care about the lower 2 bits of uo_out
         actual_val = dut.uo_out.value.to_unsigned() & 0x03
         assert actual_val == val
@@ -45,7 +45,7 @@ async def test_project(dut):
     for val in expected_values:
         await ClockCycles(dut.clk, 1)
         await cocotb.triggers.ReadOnly()
-        await NextTimeStep()
+        await cocotb.triggers.NextTimeStep()
         actual_val = dut.uo_out.value.to_unsigned() & 0x03
         assert actual_val == val
         dut._log.info(f"Down Count: {actual_val}")
