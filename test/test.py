@@ -26,26 +26,28 @@ async def test_project(dut):
     dut._log.info("Testing Up Counter...")
     dut.ui_in.value = 1  # ui_in[0] set to 1
 
-    expected_values = [0, 1, 2, 3, 0, 1]
+    expected_values = [1, 2, 3, 0, 1, 2]
     for val in expected_values:
         await ClockCycles(dut.clk, 1)
         await cocotb.triggers.ReadOnly()
+        await NextTimeStep()
         # We only care about the lower 2 bits of uo_out
         actual_val = dut.uo_out.value.to_unsigned() & 0x03
-        #assert actual_val == val
+        assert actual_val == val
         dut._log.info(f"Up Count: {actual_val}")
 
     # 4. Test Down Counting (ui_in[0] = 0)
     dut._log.info("Testing Down Counter...")
     dut.ui_in.value = 0  # ui_in[0] set to 0
     
-    # Current state is 0, next should be 3, 2, 1, 0
-    expected_values = [0, 3, 2, 1, 0, 3]
+    
+    expected_values = [1, 0, 3, 2, 1, 0]
     for val in expected_values:
         await ClockCycles(dut.clk, 1)
         await cocotb.triggers.ReadOnly()
+        await NextTimeStep()
         actual_val = dut.uo_out.value.to_unsigned() & 0x03
-        #assert actual_val == val
+        assert actual_val == val
         dut._log.info(f"Down Count: {actual_val}")
 
     dut._log.info("All tests passed!")
